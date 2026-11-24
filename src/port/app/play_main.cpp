@@ -21051,6 +21051,10 @@ std::set<std::uint32_t> lan_joiner_authored;   // 134lt9: the joiner's authored 
                 // The render-list update 0037afd0 steps the material animators (003d24b0) with the frame time.
                 // Checkpoint 132f: 00244fa0's clock (+6dc += dt while app +67 is clear) and its GUI tail.
                 if(!(gui_overlay_draw&&gui_overlay_draw->world_paused())){
+                    // Port-only cheat Freeze Mission Timer: the mission clock does not advance, so the pause menu's
+                    // mission time, the debrief time and the HUD countdowns (judged against this clock) all stop.
+                    // Solo only (in LAN games the clocks follow the host).
+                    const float clock_before_freeze=mission_clock_6dc;
                     if(cue_host){
                         // Checkpoint 132vo: the head 0x00244fd0..0x00245198 (clock, par quarters, 00245400(0x15, n)).
                         HudUpdateFields fields;fields.clock_6dc=mission_clock_6dc;
@@ -21058,6 +21062,7 @@ std::set<std::uint32_t> lan_joiner_authored;   // 134lt9: the joiner's authored 
                         hud_mission_cues(fields,cue_statics,step_dt,*cue_host);
                         mission_clock_6dc=fields.clock_6dc;
                     }else mission_clock_6dc+=step_dt;
+                    if(!lan_net&&port_cheat(PortCheat::freeze_timer))mission_clock_6dc=clock_before_freeze;
                     if(timer_host){
                         // Checkpoint 132sx3: 00244fa0's timers (after the map update) against the clock just advanced.
                         timer_host->fields.clock_6dc=mission_clock_6dc;

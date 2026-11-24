@@ -142,15 +142,17 @@ enum class PortCheat : std::uint8_t {
     unlock_levels,
     max_rank,
     unlock_rank_rewards,
+    freeze_timer,      // port-only: the mission clock (+6dc) stops, and with it the HUD countdowns (solo only)
 };
-inline constexpr std::size_t port_cheat_count = 10;
+inline constexpr std::size_t port_cheat_count = 11;
 // The screen's row label keys ("PortCheat%d"), in PortCheat order.
 inline constexpr std::array<const char*, port_cheat_count> port_cheat_names = {
     "Infinite Health", "Infinite Armour", "Infinite Ammo", "End Level", "Super Agent", "NPCs Ignore You",
-    "Unlock All Weapons", "Unlock All Levels", "Max Rank", "Unlock All Rank Rewards"};
+    "Unlock All Weapons", "Unlock All Levels", "Max Rank", "Unlock All Rank Rewards",
+    "Freeze Mission Timer"};
 
 constexpr bool port_cheat_is_action(PortCheat c) {
-    return c == PortCheat::end_level || c >= PortCheat::unlock_weapons;
+    return c == PortCheat::end_level || (c >= PortCheat::unlock_weapons && c <= PortCheat::unlock_rank_rewards);
 }
 // Invoke a one-click unlock each time it is selected, without storing toggle state.
 void port_activate_cheat(PortCheat c);
@@ -167,7 +169,7 @@ bool port_cheat_menu_enabled();
 void port_set_cheat_menu_enabled(bool enabled);
 
 // The Cheats screen's strings: StartMenu7 / StartMenuOpt7 (the start menu's
-// 8th entry and its description), PortCheatsTitle and PortCheat0..9; StartMenu8 / StartMenuOpt8 the
+// 8th entry and its description), PortCheatsTitle and PortCheat0..10; StartMenu8 / StartMenuOpt8 the
 // port-only Port Settings entry (checkpoint 132win11).
 std::optional<std::string> port_cheat_string(const std::string& key);
 

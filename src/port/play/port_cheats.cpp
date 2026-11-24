@@ -215,9 +215,11 @@ std::optional<std::string> port_cheat_string(const std::string& key) {
     // Port-only (checkpoint 132win11): the pause menu's Port Settings entry.
     if (key == "StartMenu8") return std::string("Port Settings");
     if (key == "StartMenuOpt8") return std::string("Port-only settings");
-    if (key.size() == 10 && key.compare(0, 9, "PortCheat") == 0 && key[9] >= '0' &&
-        key[9] < static_cast<char>('0' + port_cheat_count))
-        return std::string(port_cheat_names[static_cast<std::size_t>(key[9] - '0')]);
+    if (key.size() > 9 && key.size() <= 11 && key.compare(0, 9, "PortCheat") == 0 &&
+        key.find_first_not_of("0123456789", 9) == std::string::npos) {
+        const auto i = static_cast<std::size_t>(std::stoi(key.substr(9)));
+        if (i < port_cheat_count) return std::string(port_cheat_names[i]);
+    }
     return std::nullopt;
 }
 
@@ -358,10 +360,10 @@ void append_ingame_button(GuiNode& group, const std::string& name, const std::st
 }  // namespace
 
 GuiNode port_cheats_screen(const GuiNode& gameopt2) {
-    // Ten rows fit between the title and bottom help text. Action labels use the
-    // whole selectable row rather than the left-hand toggle label column.
+    // The rows share the span ten rows 27 apart had between the title and bottom help text. Action labels
+    // use the whole selectable row rather than the left-hand toggle label column.
     auto screen = options_rows_screen(gameopt2, "portcheats", "pc_", "$PortCheatsTitle", "$PortCheat",
-                                      port_cheat_count, 100.0F, 27.0F);
+                                      port_cheat_count, 100.0F, 270.0F / static_cast<float>(port_cheat_count));
     for (std::size_t i = 0; i < port_cheat_count; ++i) {
         if (!port_cheat_is_action(static_cast<PortCheat>(i))) continue;
         auto* label = find_node(screen, "pc_label" + std::to_string(i));
